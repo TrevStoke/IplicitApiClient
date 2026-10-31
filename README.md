@@ -3,7 +3,7 @@
 A clean, modern, and high-performance PHP API client for **Iplicit** (online financial accounting software), generated against the official Iplicit OpenAPI / Swagger specification.
 
 [![PHP Version](https://img.shields.io/badge/php-%3E%3D8.1-blue.svg)](https://www.php.net)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![License: BSD-3-Clause](https://img.shields.io/badge/License-BSD--3--Clause-blue.svg)](LICENSE)
 
 ---
 
@@ -22,7 +22,7 @@ A clean, modern, and high-performance PHP API client for **Iplicit** (online fin
 Install the package via Composer:
 
 ```bash
-composer require iplicit/api-client
+composer require trevweb/iplicit-api-client
 ```
 
 ---
@@ -210,4 +210,4 @@ vendor/bin/phpunit
 
 ## License
 
-This package is open-sourced software licensed under the [MIT license](LICENSE).
+This package is open-sourced software licensed under the [BSD-3-Clause license](LICENSE).
