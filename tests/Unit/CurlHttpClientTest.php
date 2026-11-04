@@ -40,4 +40,52 @@ class CurlHttpClientTest extends TestCase
         $client->setMaxRedirects(3);
         $this->assertSame(3, $client->getMaxRedirects());
     }
+
+    public function testPostRequestFollowsRedirectWithPayloadAndContentLength(): void
+    {
+        $serverScript = sys_get_temp_dir() . '/iplicit_test_server_' . uniqid() . '.php';
+        file_put_contents($serverScript, '<?php
+if ($_SERVER["REQUEST_URI"] === "/redirect") {
+    header("Location: /destination", true, 302);
+    exit;
+}
+echo json_encode([
+    "method" => $_SERVER["REQUEST_METHOD"],
+    "content_length" => $_SERVER["HTTP_CONTENT_LENGTH"] ?? $_SERVER["CONTENT_LENGTH"] ?? null,
+    "body" => file_get_contents("php://input"),
+]);
+');
+
+        $port = 9876;
+        $pipes = [];
+        $process = proc_open(
+            "php -S 127.0.0.1:{$port} " . escapeshellarg($serverScript),
+            [0 => ['pipe', 'r'], 1 => ['pipe', 'w'], 2 => ['pipe', 'w']],
+            $pipes
+        );
+
+        usleep(100000); // 100ms startup
+
+        try {
+            $client = new CurlHttpClient(followLocation: true);
+            $request = new Request('POST', "http://127.0.0.1:{$port}/redirect", body: ['apiKey' => 'test-key-123']);
+
+            $response = $client->send($request);
+            $this->assertSame(200, $response->getStatusCode());
+
+            $data = $response->json();
+            $this->assertSame('POST', $data['method']);
+            $this->assertNotNull($data['content_length']);
+            $this->assertNotSame('', $data['body']);
+            $this->assertSame(['apiKey' => 'test-key-123'], json_decode($data['body'], true));
+        } finally {
+            if (is_resource($process)) {
+                proc_terminate($process);
+                proc_close($process);
+            }
+            if (file_exists($serverScript)) {
+                unlink($serverScript);
+            }
+        }
+    }
 }

@@ -61,7 +61,7 @@ class CurlHttpClient implements HttpClientInterface
         }
 
         $url = $request->getFullUrl();
-        $method = $request->getMethod();
+        $method = strtoupper($request->getMethod());
         $timeout = $request->getTimeout() > 0 ? $request->getTimeout() : $this->defaultTimeout;
 
         // Build headers
@@ -112,7 +112,6 @@ class CurlHttpClient implements HttpClientInterface
             CURLOPT_SSL_VERIFYPEER => $this->verifySsl,
             CURLOPT_SSL_VERIFYHOST => $this->verifySsl ? 2 : 0,
             CURLOPT_HTTPHEADER => $formattedHeaders,
-            CURLOPT_CUSTOMREQUEST => $method,
             CURLOPT_HEADERFUNCTION => function ($ch, string $headerLine) use (&$responseHeaders): int {
                 $len = strlen($headerLine);
                 $parts = explode(':', $headerLine, 2);
@@ -133,8 +132,30 @@ class CurlHttpClient implements HttpClientInterface
             },
         ];
 
-        if ($payload !== null) {
-            $options[CURLOPT_POSTFIELDS] = $payload;
+        if ($this->followLocation) {
+            $options[CURLOPT_POSTREDIR] = CURL_REDIR_POST_ALL;
+        }
+
+        switch ($method) {
+            case 'GET':
+                $options[CURLOPT_HTTPGET] = true;
+                break;
+            case 'POST':
+                $options[CURLOPT_POST] = true;
+                $options[CURLOPT_POSTFIELDS] = $payload ?? '';
+                break;
+            case 'HEAD':
+                $options[CURLOPT_NOBODY] = true;
+                break;
+            case 'PUT':
+            case 'PATCH':
+            case 'DELETE':
+            default:
+                $options[CURLOPT_CUSTOMREQUEST] = $method;
+                if ($payload !== null) {
+                    $options[CURLOPT_POSTFIELDS] = $payload;
+                }
+                break;
         }
 
         curl_setopt_array($ch, $options);
