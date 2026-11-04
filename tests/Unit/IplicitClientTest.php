@@ -62,7 +62,7 @@ class IplicitClientTest extends TestCase
         $this->assertNotNull($lastRequest);
         $this->assertSame('POST', $lastRequest->getMethod());
         $this->assertSame('https://api.iplicit.com/api/Session/create/api', $lastRequest->getUrl());
-        $this->assertSame(['apiKey' => 'my-api-key', 'username' => 'API'], $lastRequest->getBody());
+        $this->assertSame(['username' => 'API', 'userApiKey' => 'my-api-key'], $lastRequest->getBody());
     }
 
     public function testAuthenticationPassesUsernameExplicitly(): void
@@ -81,7 +81,7 @@ class IplicitClientTest extends TestCase
 
         $lastRequest = $mockHttp->getLastRequest();
         $this->assertNotNull($lastRequest);
-        $this->assertSame(['apiKey' => 'override-key', 'username' => 'override-user'], $lastRequest->getBody());
+        $this->assertSame(['username' => 'override-user', 'userApiKey' => 'override-key'], $lastRequest->getBody());
     }
 
     public function testAuthenticationWithJsonObjectResponse(): void

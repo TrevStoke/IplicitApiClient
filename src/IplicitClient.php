@@ -201,9 +201,12 @@ class IplicitClient
 
         $user = $username ?? $this->config->getUsername();
 
-        $payload = ['apiKey' => $key];
+        $payload = [];
         if ($user !== null && $user !== '') {
             $payload['username'] = $user;
+            $payload['userApiKey'] = $key;
+        } else {
+            $payload['apiKey'] = $key;
         }
 
         $response = $this->request('POST', '/api/Session/create/api', [], $payload);
