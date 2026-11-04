@@ -15,6 +15,7 @@ class Config
 
     private string $baseUrl;
     private ?string $apiKey;
+    private ?string $username;
     private ?string $sessionToken;
     private ?string $domain;
     private int $timeout;
@@ -34,9 +35,11 @@ class Config
         bool $followLocation = true,
         int $maxRedirects = 5,
         int $postRedir = CURL_REDIR_POST_ALL,
-        ?HttpClientInterface $httpClient = null
+        ?HttpClientInterface $httpClient = null,
+        ?string $username = null
     ) {
         $this->apiKey = $apiKey;
+        $this->username = $username;
         $this->sessionToken = $sessionToken;
         $this->domain = $domain;
         $this->baseUrl = rtrim($baseUrl, '/');
@@ -67,6 +70,17 @@ class Config
     public function setApiKey(?string $apiKey): self
     {
         $this->apiKey = $apiKey;
+        return $this;
+    }
+
+    public function getUsername(): ?string
+    {
+        return $this->username;
+    }
+
+    public function setUsername(?string $username): self
+    {
+        $this->username = $username;
         return $this;
     }
 

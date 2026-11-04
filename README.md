@@ -36,7 +36,8 @@ use Iplicit\IplicitClient;
 
 $client = new IplicitClient(
     configOrApiKey: 'YOUR_IPLICIT_API_KEY',
-    domain: 'your-domain-code' // optional domain header
+    domain: 'your-domain-code', // optional domain header
+    username: 'API'             // optional username if required by tenant/user key
 );
 
 // Authenticate to obtain a user session token

@@ -15,6 +15,7 @@ class ConfigTest extends TestCase
         $config = new Config();
         $this->assertSame(Config::DEFAULT_BASE_URL, $config->getBaseUrl());
         $this->assertNull($config->getApiKey());
+        $this->assertNull($config->getUsername());
         $this->assertNull($config->getSessionToken());
         $this->assertNull($config->getDomain());
         $this->assertSame(30, $config->getTimeout());
@@ -38,11 +39,13 @@ class ConfigTest extends TestCase
             followLocation: false,
             maxRedirects: 10,
             postRedir: 0,
-            httpClient: $mockHttp
+            httpClient: $mockHttp,
+            username: 'my-user'
         );
 
         $this->assertSame('https://custom.api.com', $config->getBaseUrl());
         $this->assertSame('key123', $config->getApiKey());
+        $this->assertSame('my-user', $config->getUsername());
         $this->assertSame('token456', $config->getSessionToken());
         $this->assertSame('my-domain', $config->getDomain());
         $this->assertSame(60, $config->getTimeout());
@@ -57,6 +60,9 @@ class ConfigTest extends TestCase
 
         $config->setApiKey('newKey');
         $this->assertSame('newKey', $config->getApiKey());
+
+        $config->setUsername('newUser');
+        $this->assertSame('newUser', $config->getUsername());
 
         $config->setSessionToken('newToken');
         $this->assertSame('newToken', $config->getSessionToken());

@@ -41,6 +41,49 @@ class IplicitClientTest extends TestCase
         $this->assertSame(['apiKey' => 'my-api-key'], $lastRequest->getBody());
     }
 
+    public function testAuthenticationWithUsername(): void
+    {
+        $mockHttp = new MockHttpClient();
+        $mockHttp->addJsonResponse('session-token-abc', 200);
+
+        $client = new IplicitClient(
+            configOrApiKey: 'my-api-key',
+            httpClient: $mockHttp,
+            username: 'API'
+        );
+
+        $this->assertSame('API', $client->getUsername());
+
+        $token = $client->authenticate();
+
+        $this->assertSame('session-token-abc', $token);
+
+        $lastRequest = $mockHttp->getLastRequest();
+        $this->assertNotNull($lastRequest);
+        $this->assertSame('POST', $lastRequest->getMethod());
+        $this->assertSame('https://api.iplicit.com/api/Session/create/api', $lastRequest->getUrl());
+        $this->assertSame(['apiKey' => 'my-api-key', 'username' => 'API'], $lastRequest->getBody());
+    }
+
+    public function testAuthenticationPassesUsernameExplicitly(): void
+    {
+        $mockHttp = new MockHttpClient();
+        $mockHttp->addJsonResponse('session-token-explicit', 200);
+
+        $client = new IplicitClient(
+            configOrApiKey: 'my-api-key',
+            httpClient: $mockHttp
+        );
+
+        $token = $client->authenticate(apiKey: 'override-key', username: 'override-user');
+
+        $this->assertSame('session-token-explicit', $token);
+
+        $lastRequest = $mockHttp->getLastRequest();
+        $this->assertNotNull($lastRequest);
+        $this->assertSame(['apiKey' => 'override-key', 'username' => 'override-user'], $lastRequest->getBody());
+    }
+
     public function testAuthenticationWithJsonObjectResponse(): void
     {
         $mockHttp = new MockHttpClient();

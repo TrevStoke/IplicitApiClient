@@ -92,13 +92,15 @@ class IplicitClient
      * @param string|null $domain Iplicit domain code
      * @param string $baseUrl Base URL of the API
      * @param HttpClientInterface|null $httpClient Custom HTTP client implementation
+     * @param string|null $username Iplicit username for API authentication
      */
     public function __construct(
         Config|string|null $configOrApiKey = null,
         ?string $sessionToken = null,
         ?string $domain = null,
         string $baseUrl = Config::DEFAULT_BASE_URL,
-        ?HttpClientInterface $httpClient = null
+        ?HttpClientInterface $httpClient = null,
+        ?string $username = null
     ) {
         if ($configOrApiKey instanceof Config) {
             $this->config = $configOrApiKey;
@@ -108,7 +110,8 @@ class IplicitClient
                 sessionToken: $sessionToken,
                 domain: $domain,
                 baseUrl: $baseUrl,
-                httpClient: $httpClient
+                httpClient: $httpClient,
+                username: $username
             );
         }
 
@@ -159,6 +162,17 @@ class IplicitClient
         return $this;
     }
 
+    public function getUsername(): ?string
+    {
+        return $this->config->getUsername();
+    }
+
+    public function setUsername(?string $username): self
+    {
+        $this->config->setUsername($username);
+        return $this;
+    }
+
     public function getDomain(): ?string
     {
         return $this->config->getDomain();
@@ -171,20 +185,28 @@ class IplicitClient
     }
 
     /**
-     * Authenticates with the API using an API key and stores the resulting session token.
+     * Authenticates with the API using an API key and optional username, storing the resulting session token.
      *
      * @param string|null $apiKey If null, uses the configured API key.
+     * @param string|null $username If null, uses the configured username.
      * @return string The authenticated user session token.
      * @throws AuthenticationException If authentication fails.
      */
-    public function authenticate(?string $apiKey = null): string
+    public function authenticate(?string $apiKey = null, ?string $username = null): string
     {
         $key = $apiKey ?? $this->config->getApiKey();
         if ($key === null || $key === '') {
             throw new AuthenticationException('API key is required to authenticate with Iplicit');
         }
 
-        $response = $this->request('POST', '/api/Session/create/api', [], ['apiKey' => $key]);
+        $user = $username ?? $this->config->getUsername();
+
+        $payload = ['apiKey' => $key];
+        if ($user !== null && $user !== '') {
+            $payload['username'] = $user;
+        }
+
+        $response = $this->request('POST', '/api/Session/create/api', [], $payload);
         $data = $response->json();
 
         $token = null;
