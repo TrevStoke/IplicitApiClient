@@ -14,15 +14,43 @@ class CurlHttpClient implements HttpClientInterface
     private array $defaultHeaders;
     private int $defaultTimeout;
     private bool $verifySsl;
+    private bool $followLocation;
+    private int $maxRedirects;
 
     public function __construct(
         array $defaultHeaders = [],
         int $defaultTimeout = 30,
-        bool $verifySsl = true
+        bool $verifySsl = true,
+        bool $followLocation = true,
+        int $maxRedirects = 5
     ) {
         $this->defaultHeaders = $defaultHeaders;
         $this->defaultTimeout = $defaultTimeout;
         $this->verifySsl = $verifySsl;
+        $this->followLocation = $followLocation;
+        $this->maxRedirects = $maxRedirects;
+    }
+
+    public function isFollowLocation(): bool
+    {
+        return $this->followLocation;
+    }
+
+    public function setFollowLocation(bool $followLocation): self
+    {
+        $this->followLocation = $followLocation;
+        return $this;
+    }
+
+    public function getMaxRedirects(): int
+    {
+        return $this->maxRedirects;
+    }
+
+    public function setMaxRedirects(int $maxRedirects): self
+    {
+        $this->maxRedirects = $maxRedirects;
+        return $this;
     }
 
     public function send(Request $request): Response
@@ -79,6 +107,8 @@ class CurlHttpClient implements HttpClientInterface
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_TIMEOUT => $timeout,
             CURLOPT_CONNECTTIMEOUT => min(10, $timeout),
+            CURLOPT_FOLLOWLOCATION => $this->followLocation,
+            CURLOPT_MAXREDIRS => $this->maxRedirects,
             CURLOPT_SSL_VERIFYPEER => $this->verifySsl,
             CURLOPT_SSL_VERIFYHOST => $this->verifySsl ? 2 : 0,
             CURLOPT_HTTPHEADER => $formattedHeaders,

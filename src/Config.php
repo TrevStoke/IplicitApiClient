@@ -19,6 +19,8 @@ class Config
     private ?string $domain;
     private int $timeout;
     private bool $verifySsl;
+    private bool $followLocation;
+    private int $maxRedirects;
     private ?HttpClientInterface $httpClient;
 
     public function __construct(
@@ -28,6 +30,8 @@ class Config
         string $baseUrl = self::DEFAULT_BASE_URL,
         int $timeout = 30,
         bool $verifySsl = true,
+        bool $followLocation = true,
+        int $maxRedirects = 5,
         ?HttpClientInterface $httpClient = null
     ) {
         $this->apiKey = $apiKey;
@@ -36,6 +40,8 @@ class Config
         $this->baseUrl = rtrim($baseUrl, '/');
         $this->timeout = $timeout;
         $this->verifySsl = $verifySsl;
+        $this->followLocation = $followLocation;
+        $this->maxRedirects = $maxRedirects;
         $this->httpClient = $httpClient;
     }
 
@@ -102,6 +108,28 @@ class Config
     public function setVerifySsl(bool $verifySsl): self
     {
         $this->verifySsl = $verifySsl;
+        return $this;
+    }
+
+    public function isFollowLocation(): bool
+    {
+        return $this->followLocation;
+    }
+
+    public function setFollowLocation(bool $followLocation): self
+    {
+        $this->followLocation = $followLocation;
+        return $this;
+    }
+
+    public function getMaxRedirects(): int
+    {
+        return $this->maxRedirects;
+    }
+
+    public function setMaxRedirects(int $maxRedirects): self
+    {
+        $this->maxRedirects = $maxRedirects;
         return $this;
     }
 

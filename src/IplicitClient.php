@@ -114,7 +114,9 @@ class IplicitClient
 
         $this->httpClient = $this->config->getHttpClient() ?? $httpClient ?? new CurlHttpClient(
             defaultTimeout: $this->config->getTimeout(),
-            verifySsl: $this->config->isVerifySsl()
+            verifySsl: $this->config->isVerifySsl(),
+            followLocation: $this->config->isFollowLocation(),
+            maxRedirects: $this->config->getMaxRedirects()
         );
     }
 

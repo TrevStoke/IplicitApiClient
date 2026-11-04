@@ -19,6 +19,8 @@ class ConfigTest extends TestCase
         $this->assertNull($config->getDomain());
         $this->assertSame(30, $config->getTimeout());
         $this->assertTrue($config->isVerifySsl());
+        $this->assertTrue($config->isFollowLocation());
+        $this->assertSame(5, $config->getMaxRedirects());
         $this->assertNull($config->getHttpClient());
     }
 
@@ -32,6 +34,8 @@ class ConfigTest extends TestCase
             baseUrl: 'https://custom.api.com/',
             timeout: 60,
             verifySsl: false,
+            followLocation: false,
+            maxRedirects: 10,
             httpClient: $mockHttp
         );
 
@@ -41,6 +45,8 @@ class ConfigTest extends TestCase
         $this->assertSame('my-domain', $config->getDomain());
         $this->assertSame(60, $config->getTimeout());
         $this->assertFalse($config->isVerifySsl());
+        $this->assertFalse($config->isFollowLocation());
+        $this->assertSame(10, $config->getMaxRedirects());
         $this->assertSame($mockHttp, $config->getHttpClient());
 
         $config->setBaseUrl('https://api.iplicit.com/');
@@ -60,5 +66,11 @@ class ConfigTest extends TestCase
 
         $config->setVerifySsl(true);
         $this->assertTrue($config->isVerifySsl());
+
+        $config->setFollowLocation(true);
+        $this->assertTrue($config->isFollowLocation());
+
+        $config->setMaxRedirects(7);
+        $this->assertSame(7, $config->getMaxRedirects());
     }
 }

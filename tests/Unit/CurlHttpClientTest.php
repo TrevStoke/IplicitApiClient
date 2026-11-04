@@ -25,9 +25,19 @@ class CurlHttpClientTest extends TestCase
         $client = new CurlHttpClient(
             defaultHeaders: ['X-Custom' => 'HeaderVal'],
             defaultTimeout: 10,
-            verifySsl: false
+            verifySsl: false,
+            followLocation: true,
+            maxRedirects: 10
         );
 
         $this->assertInstanceOf(CurlHttpClient::class, $client);
+        $this->assertTrue($client->isFollowLocation());
+        $this->assertSame(10, $client->getMaxRedirects());
+
+        $client->setFollowLocation(false);
+        $this->assertFalse($client->isFollowLocation());
+
+        $client->setMaxRedirects(3);
+        $this->assertSame(3, $client->getMaxRedirects());
     }
 }
