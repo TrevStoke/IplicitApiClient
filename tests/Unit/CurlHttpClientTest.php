@@ -27,18 +27,23 @@ class CurlHttpClientTest extends TestCase
             defaultTimeout: 10,
             verifySsl: false,
             followLocation: true,
-            maxRedirects: 10
+            maxRedirects: 10,
+            postRedir: CURL_REDIR_POST_301 | CURL_REDIR_POST_302
         );
 
         $this->assertInstanceOf(CurlHttpClient::class, $client);
         $this->assertTrue($client->isFollowLocation());
         $this->assertSame(10, $client->getMaxRedirects());
+        $this->assertSame(CURL_REDIR_POST_301 | CURL_REDIR_POST_302, $client->getPostRedir());
 
         $client->setFollowLocation(false);
         $this->assertFalse($client->isFollowLocation());
 
         $client->setMaxRedirects(3);
         $this->assertSame(3, $client->getMaxRedirects());
+
+        $client->setPostRedir(0);
+        $this->assertSame(0, $client->getPostRedir());
     }
 
     public function testPostRequestFollowsRedirectWithPayloadAndContentLength(): void

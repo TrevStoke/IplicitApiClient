@@ -21,6 +21,7 @@ class Config
     private bool $verifySsl;
     private bool $followLocation;
     private int $maxRedirects;
+    private int $postRedir;
     private ?HttpClientInterface $httpClient;
 
     public function __construct(
@@ -32,6 +33,7 @@ class Config
         bool $verifySsl = true,
         bool $followLocation = true,
         int $maxRedirects = 5,
+        int $postRedir = CURL_REDIR_POST_ALL,
         ?HttpClientInterface $httpClient = null
     ) {
         $this->apiKey = $apiKey;
@@ -42,6 +44,7 @@ class Config
         $this->verifySsl = $verifySsl;
         $this->followLocation = $followLocation;
         $this->maxRedirects = $maxRedirects;
+        $this->postRedir = $postRedir;
         $this->httpClient = $httpClient;
     }
 
@@ -130,6 +133,17 @@ class Config
     public function setMaxRedirects(int $maxRedirects): self
     {
         $this->maxRedirects = $maxRedirects;
+        return $this;
+    }
+
+    public function getPostRedir(): int
+    {
+        return $this->postRedir;
+    }
+
+    public function setPostRedir(int $postRedir): self
+    {
+        $this->postRedir = $postRedir;
         return $this;
     }
 

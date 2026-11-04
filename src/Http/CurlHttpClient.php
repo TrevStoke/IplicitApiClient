@@ -16,19 +16,22 @@ class CurlHttpClient implements HttpClientInterface
     private bool $verifySsl;
     private bool $followLocation;
     private int $maxRedirects;
+    private int $postRedir;
 
     public function __construct(
         array $defaultHeaders = [],
         int $defaultTimeout = 30,
         bool $verifySsl = true,
         bool $followLocation = true,
-        int $maxRedirects = 5
+        int $maxRedirects = 5,
+        int $postRedir = CURL_REDIR_POST_ALL
     ) {
         $this->defaultHeaders = $defaultHeaders;
         $this->defaultTimeout = $defaultTimeout;
         $this->verifySsl = $verifySsl;
         $this->followLocation = $followLocation;
         $this->maxRedirects = $maxRedirects;
+        $this->postRedir = $postRedir;
     }
 
     public function isFollowLocation(): bool
@@ -50,6 +53,17 @@ class CurlHttpClient implements HttpClientInterface
     public function setMaxRedirects(int $maxRedirects): self
     {
         $this->maxRedirects = $maxRedirects;
+        return $this;
+    }
+
+    public function getPostRedir(): int
+    {
+        return $this->postRedir;
+    }
+
+    public function setPostRedir(int $postRedir): self
+    {
+        $this->postRedir = $postRedir;
         return $this;
     }
 
@@ -132,8 +146,8 @@ class CurlHttpClient implements HttpClientInterface
             },
         ];
 
-        if ($this->followLocation) {
-            $options[CURLOPT_POSTREDIR] = CURL_REDIR_POST_ALL;
+        if ($this->followLocation && $this->postRedir > 0) {
+            $options[CURLOPT_POSTREDIR] = $this->postRedir;
         }
 
         switch ($method) {

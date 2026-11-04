@@ -116,7 +116,8 @@ class IplicitClient
             defaultTimeout: $this->config->getTimeout(),
             verifySsl: $this->config->isVerifySsl(),
             followLocation: $this->config->isFollowLocation(),
-            maxRedirects: $this->config->getMaxRedirects()
+            maxRedirects: $this->config->getMaxRedirects(),
+            postRedir: $this->config->getPostRedir()
         );
     }
 

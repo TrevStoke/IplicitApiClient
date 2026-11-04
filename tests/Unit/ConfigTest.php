@@ -21,6 +21,7 @@ class ConfigTest extends TestCase
         $this->assertTrue($config->isVerifySsl());
         $this->assertTrue($config->isFollowLocation());
         $this->assertSame(5, $config->getMaxRedirects());
+        $this->assertSame(CURL_REDIR_POST_ALL, $config->getPostRedir());
         $this->assertNull($config->getHttpClient());
     }
 
@@ -36,6 +37,7 @@ class ConfigTest extends TestCase
             verifySsl: false,
             followLocation: false,
             maxRedirects: 10,
+            postRedir: 0,
             httpClient: $mockHttp
         );
 
@@ -47,6 +49,7 @@ class ConfigTest extends TestCase
         $this->assertFalse($config->isVerifySsl());
         $this->assertFalse($config->isFollowLocation());
         $this->assertSame(10, $config->getMaxRedirects());
+        $this->assertSame(0, $config->getPostRedir());
         $this->assertSame($mockHttp, $config->getHttpClient());
 
         $config->setBaseUrl('https://api.iplicit.com/');
@@ -72,5 +75,8 @@ class ConfigTest extends TestCase
 
         $config->setMaxRedirects(7);
         $this->assertSame(7, $config->getMaxRedirects());
+
+        $config->setPostRedir(CURL_REDIR_POST_301 | CURL_REDIR_POST_302);
+        $this->assertSame(CURL_REDIR_POST_301 | CURL_REDIR_POST_302, $config->getPostRedir());
     }
 }
