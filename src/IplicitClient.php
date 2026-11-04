@@ -252,7 +252,6 @@ class IplicitClient
 
         if ($this->config->getDomain() !== null && $this->config->getDomain() !== '') {
             $requestHeaders['domain'] = $this->config->getDomain();
-            $requestHeaders['Domain'] = $this->config->getDomain();
         }
 
         foreach ($headers as $k => $v) {
